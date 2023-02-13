@@ -74,14 +74,18 @@ jobs:
 
       - name: Identify include paths for g++
         run: |
+          set +x
           echo "Verifying we can invoke G++"
           echo | g++ -E -x c++ - -v 2>&1
-          echo "Sed program"
-          echo "'/search starts here/,/End of search list/{/search starts/b;/search list/b;p}'"
+          echo "awk program"
+          #echo "'/search starts here/,/End of search list/{/search starts/b;/search list/b;p}'"
+          echo "awk  '/search starts here/,/End of search list/{if (!/search starts/ && !/search list/) print}'"
           echo "Looking for include paths"
-          echo | g++ -E -x c++ - -v 2>&1 | sed -n '/search starts here/,/End of search list/{/search starts/b;/search list/b;p}'
+          #echo | g++ -E -x c++ - -v 2>&1 | sed -n '/search starts here/,/End of search list/{/search starts/b;/search list/b;p}'
+          echo | g++ -E -x c++ - -v 2>&1 | awk  '/search starts here/,/End of search list/{if (!/search starts/ && !/search list/) print}'
           echo "Looking for a definition of UTIME_* macros in those search paths"
-          echo | g++ -E -x c++ - -v 2>&1 | sed -n '/search starts here/,/End of search list/{/search starts/b;/search list/b;p}' | xargs grep -r UTIME_
+          #echo | g++ -E -x c++ - -v 2>&1 | sed -n '/search starts here/,/End of search list/{/search starts/b;/search list/b;p}' | xargs grep -r UTIME_
+          echo | g++ -E -x c++ - -v 2>&1 | awk  '/search starts here/,/End of search list/{if (!/search starts/ && !/search list/) print}' | xargs grep -r UTIME_
       # - name: Build
       #   run: |
       #     ./autogen.sh
