@@ -75,8 +75,9 @@ jobs:
       - name: Identify include paths for g++
         run: |
           echo "Verifying we can invoke G++"
-          g++ --help
           echo | g++ -E -x c++ - -v 2>&1
+          echo "Sed program"
+          echo "'/search starts here/,/End of search list/{/search starts/b;/search list/b;p}'"
           echo "Looking for include paths"
           echo | g++ -E -x c++ - -v 2>&1 | sed -n '/search starts here/,/End of search list/{/search starts/b;/search list/b;p}'
           echo "Looking for a definition of UTIME_* macros in those search paths"
