@@ -47,33 +47,36 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      - name: Brew tap
-        run: |
-          TAPS="$(brew --repository)/Library/Taps";
-          if [ -e "$TAPS/caskroom/homebrew-cask" ]; then rm -rf "$TAPS/caskroom/homebrew-cask"; fi;
-          HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/homebrew-cask
+      # - name: Brew tap
+      #   run: |
+      #     TAPS="$(brew --repository)/Library/Taps";
+      #     if [ -e "$TAPS/caskroom/homebrew-cask" ]; then rm -rf "$TAPS/caskroom/homebrew-cask"; fi;
+      #     HOMEBREW_NO_AUTO_UPDATE=1 brew tap homebrew/homebrew-cask
 
-      - name: Install osxfuse
-        run: |
-          HOMEBREW_NO_AUTO_UPDATE=1 brew install osxfuse
+      # - name: Install osxfuse
+      #   run: |
+      #     HOMEBREW_NO_AUTO_UPDATE=1 brew install osxfuse
 
-      - name: Install brew other packages
-        run: |
-          S3FS_BREW_PACKAGES='automake cppcheck python3 coreutils gnu-sed shellcheck';
-          for s3fs_brew_pkg in ${S3FS_BREW_PACKAGES}; do if brew list | grep -q ${s3fs_brew_pkg}; then if brew outdated | grep -q ${s3fs_brew_pkg}; then HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade ${s3fs_brew_pkg}; fi; else HOMEBREW_NO_AUTO_UPDATE=1 brew install ${s3fs_brew_pkg}; fi; done;
+      # - name: Install brew other packages
+      #   run: |
+      #     S3FS_BREW_PACKAGES='automake cppcheck python3 coreutils gnu-sed shellcheck';
+      #     for s3fs_brew_pkg in ${S3FS_BREW_PACKAGES}; do if brew list | grep -q ${s3fs_brew_pkg}; then if brew outdated | grep -q ${s3fs_brew_pkg}; then HOMEBREW_NO_AUTO_UPDATE=1 brew upgrade ${s3fs_brew_pkg}; fi; else HOMEBREW_NO_AUTO_UPDATE=1 brew install ${s3fs_brew_pkg}; fi; done;
 
-      - name: Install awscli2
-        run: |
-          cd /tmp
-          curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
-          sudo installer -pkg AWSCLIV2.pkg -target /
+      # - name: Install awscli2
+      #   run: |
+      #     cd /tmp
+      #     curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+      #     sudo installer -pkg AWSCLIV2.pkg -target /
 
-      - name: Check osxfuse permission
-        run: |
-          if [ -f /Library/Filesystems/osxfusefs.fs/Support/load_osxfusefs ]; then sudo chmod +s /Library/Filesystems/osxfusefs.fs/Support/load_osxfusefs; elif [ -f /Library/Filesystems/osxfuse.fs/Contents/Resources/load_osxfuse ]; then sudo chmod +s /Library/Filesystems/osxfuse.fs/Contents/Resources/load_osxfuse; else exit 1; fi
+      # - name: Check osxfuse permission
+      #   run: |
+      #     if [ -f /Library/Filesystems/osxfusefs.fs/Support/load_osxfusefs ]; then sudo chmod +s /Library/Filesystems/osxfusefs.fs/Support/load_osxfusefs; elif [ -f /Library/Filesystems/osxfuse.fs/Contents/Resources/load_osxfuse ]; then sudo chmod +s /Library/Filesystems/osxfuse.fs/Contents/Resources/load_osxfuse; else exit 1; fi
 
       - name: Identify include paths for g++
         run: |
+          echo "Verifying we can invoke G++"
+          g++ --help
+          echo | g++ -E -x c++ - -v 2>&1
           echo "Looking for include paths"
           echo | g++ -E -x c++ - -v 2>&1 | sed -n '/search starts here/,/End of search list/{/search starts/b;/search list/b;p}'
           echo "Looking for a definition of UTIME_* macros in those search paths"
